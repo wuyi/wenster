@@ -114,4 +114,16 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="CALC_COMPLETED">
+    <value xml:space="preserve">计算已完成</value>
+  </data>
+  <data name="CALC_READY">
+    <value xml:space="preserve">已准备就绪</value>
+  </data>
+  <data name="MSG_ERROR">
+    <value xml:space="preserve">错误</value>
+  </data>
+  <data name="CALC_ING">
+    <value xml:space="preserve">正进行计算</value>
+  </data>
 </root>

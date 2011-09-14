@@ -30,3 +30,12 @@ H:\Source\Wenster\obj\Debug\ResolveAssemblyReference.cache
 H:\Source\Wenster\obj\Debug\Wenster.frmWenster.resources
 H:\Source\Wenster\obj\Debug\Wenster.Properties.Resources.resources
 H:\Source\Wenster\obj\Debug\Wenster.csproj.GenerateResource.Cache
+D:\Dropbox\60_Repos\wenster\Wenster\obj\Debug\Wenster.exe
+D:\Dropbox\60_Repos\wenster\Wenster\obj\Debug\Wenster.pdb
+D:\Dropbox\60_Repos\wenster\Wenster\obj\Debug\ResolveAssemblyReference.cache
+D:\Dropbox\60_Repos\wenster\Wenster\obj\Debug\Wenster.frmWenster.resources
+D:\Dropbox\60_Repos\wenster\Wenster\obj\Debug\Wenster.Properties.Resources.resources
+D:\Dropbox\60_Repos\wenster\Wenster\obj\Debug\GenerateResource-ResGen.read.1.tlog
+D:\Dropbox\60_Repos\wenster\Wenster\obj\Debug\GenerateResource-ResGen.write.1.tlog
+D:\Dropbox\60_Repos\wenster\Wenster\bin\Debug\Wenster.exe
+D:\Dropbox\60_Repos\wenster\Wenster\bin\Debug\Wenster.pdb

@@ -1,15 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
-using System.Drawing;
 using System.Linq;
-using System.Text;
 using System.Windows.Forms;
 using Wenster.Entity;
 using Wenster.DataProvider;
-using System.Collections.ObjectModel;
-using System.Threading;
+using Wenster.Properties;
 
 namespace Wenster
 {
@@ -19,63 +15,62 @@ namespace Wenster
 
         //Alpha,Beta,Gamma取值范围 * 100
 
-        private const int fltMin = 1;
-        private const int fltMax = 99;
+        private const int FltMin = 1;
+        private const int FltMax = 99;
 
         //预测的来源数据
-        private List<Production> initDataList = new List<Production>();
+        private List<Production> _initDataList = new List<Production>();
 
         //所要预测的实际数据
-        private List<Production> realDataList = new List<Production>();
+        private List<Production> _realDataList = new List<Production>();
 
         //存放实时运算的最优结果集
-        private Result minResult = new Result();
+        private readonly Result _minResult = new Result();
 
         //周期的天数
-        private int intLetterL = 0;
+        private int _intLetterL = 0;
 
         //要预测的周期
-        private int intDataCount = 0;
+        private int _intDataCount = 0;
 
         //计算中用到的S、F、B
-        private List<Variable> collectionS = new List<Variable>();
-        private List<Variable> collectionB = new List<Variable>();
-        private List<Variable> collectionF = new List<Variable>();
+        private List<Variable> _collectionS = new List<Variable>();
+        private List<Variable> _collectionB = new List<Variable>();
+        private List<Variable> _collectionF = new List<Variable>();
 
         //已经循环计算的次数
-        private long lngCalcNumber = 0;
+        private long _lngCalcNumber = 0;
 
         public frmWenster()
         {
             InitializeComponent();
         }
 
-        private void frmWenster_Load(object sender, EventArgs e)
+        private void FrmWensterLoad(object sender, EventArgs e)
         {
-            this.txtLetterL.Clear();
-            this.txtInitDataCount.Clear();
-            this.txtInitDataCount.Width = this.txtLetterL.Width;
-            this.txtLetterL.Focus();
-            this.tssProcessValue.Text = "已准备就绪";
+            txtLetterL.Clear();
+            txtInitDataCount.Clear();
+            txtInitDataCount.Width = txtLetterL.Width;
+            txtLetterL.Focus();
+            tssProcessValue.Text = Resources.CALC_READY;
         }
 
-        private void btnCalc_Click(object sender, EventArgs e)
+        private void BtnCalcClick(object sender, EventArgs e)
         {
             //进行计算前的输入值检查
-            WensterInformation wi = new WensterInformation();
-            wi = ValidInputInformation();
+            var wi = ValidInputInformation();
             if (!wi.ProcessResult)
             {
-                MessageBox.Show(wi.ProcessInfomation, "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(wi.ProcessInfomation, Resources.MSG_ERROR, MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 
             //获取数据量
-            initDataList = new Provider().GetInitializeData(intLetterL).OrderBy<Production, int>(idl => idl.ID).ToList<Production>();
-            realDataList = new Provider().GetRealData(intLetterL).OrderBy<Production,int>(rdl=>rdl.ID).ToList<Production>();
+            _initDataList = new Provider().GetInitializeData(_intLetterL).OrderBy(idl => idl.ID).ToList();
+            _realDataList = new Provider().GetRealData(_intLetterL).OrderBy(rdl=>rdl.ID).ToList();
 
             //计算
-            tssProcessValue.Text = "正进行计算";
+            tssProcessValue.Text = Resources.CALC_ING;
             gbSetting.Enabled = false;
             bwProcessor.RunWorkerAsync();
 
@@ -88,12 +83,12 @@ namespace Wenster
         private WensterInformation ValidInputInformation()
         {
             
-            WensterInformation wi = new WensterInformation();
+            var wi = new WensterInformation();
 
             //检查季节性周期L 
             if (string.IsNullOrEmpty(txtLetterL.Text) 
-                || !int.TryParse(txtLetterL.Text,out intLetterL) 
-                || intLetterL == 0)
+                || !int.TryParse(txtLetterL.Text,out _intLetterL) 
+                || _intLetterL == 0)
             {
                 wi.ProcessResult = false;
                 wi.ProcessInfomation = "季节性周期的值为空，或者不是数字！";
@@ -102,8 +97,8 @@ namespace Wenster
 
             //检查初始数据量
             if (string.IsNullOrEmpty(txtInitDataCount.Text) 
-                || !int.TryParse(txtInitDataCount.Text, out intDataCount) 
-                || intDataCount == 0)
+                || !int.TryParse(txtInitDataCount.Text, out _intDataCount) 
+                || _intDataCount == 0)
             {
                 wi.ProcessResult = false;
                 wi.ProcessInfomation = "初始数据量为空，或者不是数字，或者比季节性周期L要小！";
@@ -114,123 +109,139 @@ namespace Wenster
             return wi;
         }
 
-        private void bwProcessor_DoWork(object sender, DoWorkEventArgs e)
+        private void BwProcessorDoWork(object sender, DoWorkEventArgs e)
         {
-            minResult.Prediction = new List<Variable>();
-            long lngTotalNum = fltMax * fltMax * fltMax;
+            _minResult.Prediction = new List<Variable>();
+            const long lngTotalNum = FltMax * FltMax * FltMax;
             //计算S(t)的初始值
-            Variable vS = new Variable();
-            vS.Pos = initDataList[intLetterL].ID;
-            vS.Number = initDataList[intLetterL].Number;
-            collectionS.Add(vS);
+            var vS = new Variable {Pos = _initDataList[_intLetterL].ID, Number = _initDataList[_intLetterL].Number};
+            _collectionS.Add(vS);
 
             //先计算平均值Y
-            double dblAverY = 0.00;
-            for (int index = 0; index <= intLetterL; index++)
+            var dblAverY = 0.00;
+            for (var index = 0; index <= _intLetterL; index++)
             {
-                dblAverY += initDataList[index].Number;
+                dblAverY += _initDataList[index].Number;
             }
-            dblAverY = dblAverY / (intLetterL + 1);
+            dblAverY = dblAverY / (_intLetterL + 1);
 
             //然后求出F(t)
-            for (int index = 0; index <= intLetterL; index++)
+            for (var index = 0; index <= _intLetterL; index++)
             {
-                Variable vF = new Variable();
-                vF.Pos = initDataList[index].ID;
-                vF.Number = initDataList[index].Number / dblAverY;
-                collectionF.Add(vF);
+                var vF = new Variable {Pos = _initDataList[index].ID, Number = _initDataList[index].Number/dblAverY};
+                _collectionF.Add(vF);
             }
 
             //然后求出B(t)
-            Variable vB = new Variable();
-            vB.Pos = initDataList[intLetterL].ID;
-            vB.Number = 0.00;
-            for (int index = 0; index < intLetterL -1; index++)
+            var vB = new Variable {Pos = _initDataList[_intLetterL].ID, Number = 0.00};
+            for (var index = 0; index < _intLetterL -1; index++)
             {
-                vB.Number += initDataList[intLetterL + index].Number - initDataList[index].Number;
+                vB.Number += _initDataList[_intLetterL + index].Number - _initDataList[index].Number;
             }
-            vB.Number = vB.Number / ((intLetterL -1) * intLetterL);
-            collectionB.Add(vB);
+            vB.Number = vB.Number / ((_intLetterL -1) * _intLetterL);
+            _collectionB.Add(vB);
 
-            double realAlpha = 0.00;
-            double realBeta = 0.00;
-            double realGamma = 0.00;
-            
             //遍历取Alpha,Beta,Gamma，以Alpha作为最外层元素
-            bool blnFlush = false;
 
-            for (double alpha = fltMin; alpha <= fltMax; alpha++)
+            for (double alpha = FltMin; alpha <= FltMax; alpha++)
             {
-                for (double beta = fltMin; beta <= fltMax; beta++)
+                for (double beta = FltMin; beta <= FltMax; beta++)
                 {
                     CleanCollection(9, 28);
 
-                    for (double gamma = fltMin; gamma <= fltMax; gamma++)
+                    for (double gamma = FltMin; gamma <= FltMax; gamma++)
                     {
-                        realAlpha = alpha / 100;
-                        realBeta = beta / 100;
-                        realGamma = gamma / 100;
+                        var realAlpha = alpha / 100;
+                        var realBeta = beta / 100;
+                        var realGamma = gamma / 100;
 
-                        lngCalcNumber++;
+                        _lngCalcNumber++;
 
-                        blnFlush = false;
+                        var blnFlush = false;
 
                         //求S9~S28
-                        for (int index = intLetterL + 1; index <= (intDataCount - 1) * intLetterL - 1; index++)
+                        for (var index = _intLetterL + 1; index <= (_intDataCount - 1) * _intLetterL - 1; index++)
                         {
                             //求S(index)
-                            Variable loopS = new Variable();
-                            loopS.Pos = index + 1;
-                            loopS.Number = realAlpha * (initDataList[index].Number / GetCollectionRecordValue(collectionF, index - intLetterL + 1))
-                                + (1 - realAlpha) * (GetCollectionRecordValue(collectionS, index) + GetCollectionRecordValue(collectionB, index));
-                            collectionS.Add(loopS);
+                            var loopS = new Variable
+                                            {
+                                                Pos = index + 1,
+                                                Number =
+                                                    realAlpha*
+                                                    (_initDataList[index].Number/
+                                                     GetCollectionRecordValue(_collectionF, index - _intLetterL + 1))
+                                                    +
+                                                    (1 - realAlpha)*
+                                                    (GetCollectionRecordValue(_collectionS, index) +
+                                                     GetCollectionRecordValue(_collectionB, index))
+                                            };
+                            _collectionS.Add(loopS);
 
                             //求B(index)
-                            Variable loopB = new Variable();
-                            loopB.Pos = index + 1;
-                            loopB.Number = realBeta * (GetCollectionRecordValue(collectionS, index + 1) - GetCollectionRecordValue(collectionS, index))
-                                + (1 - realBeta) * GetCollectionRecordValue(collectionB, index);
-                            collectionB.Add(loopB);
+                            var loopB = new Variable
+                                            {
+                                                Pos = index + 1,
+                                                Number =
+                                                    realBeta*
+                                                    (GetCollectionRecordValue(_collectionS, index + 1) -
+                                                     GetCollectionRecordValue(_collectionS, index))
+                                                    + (1 - realBeta)*GetCollectionRecordValue(_collectionB, index)
+                                            };
+                            _collectionB.Add(loopB);
 
                             //求F(index)
-                            Variable loopF = new Variable();
-                            loopF.Pos = index + 1;
-                            loopF.Number = realGamma * (initDataList[index].Number / GetCollectionRecordValue(collectionS, index + 1))
-                                + (1 - realGamma) * GetCollectionRecordValue(collectionF, index - intLetterL + 1);
-                            collectionF.Add(loopF);
+                            var loopF = new Variable
+                                            {
+                                                Pos = index + 1,
+                                                Number =
+                                                    realGamma*
+                                                    (_initDataList[index].Number/
+                                                     GetCollectionRecordValue(_collectionS, index + 1))
+                                                    +
+                                                    (1 - realGamma)*
+                                                    GetCollectionRecordValue(_collectionF, index - _intLetterL + 1)
+                                            };
+                            _collectionF.Add(loopF);
                         }
 
                         //求指定周期的预测数据
-                        List<Variable> preNumber = new List<Variable>();
-                        for (int index = (intDataCount - 1) * intLetterL + 1; index <= intDataCount * intLetterL; index++)
+                        var preNumber = new List<Variable>();
+                        for (var index = (_intDataCount - 1) * _intLetterL + 1; index <= _intDataCount * _intLetterL; index++)
                         {
-                            Variable preY = new Variable();
-                            preY.Pos = index;
-                            preY.Number = (GetCollectionRecordValue(collectionS,(intDataCount - 1) * intLetterL) 
-                                +GetCollectionRecordValue(collectionB,(intDataCount - 1) * intLetterL) * (index - (intDataCount - 1) * intLetterL))
-                                * GetCollectionRecordValue(collectionF, index - intLetterL);
+                            var preY = new Variable
+                                           {
+                                               Pos = index,
+                                               Number =
+                                                   (GetCollectionRecordValue(_collectionS,
+                                                                             (_intDataCount - 1)*_intLetterL)
+                                                    +
+                                                    GetCollectionRecordValue(_collectionB,
+                                                                             (_intDataCount - 1)*_intLetterL)*
+                                                    (index - (_intDataCount - 1)*_intLetterL))
+                                                   *GetCollectionRecordValue(_collectionF, index - _intLetterL)
+                                           };
                             preNumber.Add(preY);
                         }
 
                         //计算误差值，存储当前的Alpha、Beta、Gamma
-                        double deviation = 0.00;
-                        preNumber = preNumber.OrderBy<Variable, int>(var => var.Pos).ToList();
-                        foreach (Variable item in preNumber)
+                        var deviation = 0.00;
+                        preNumber = preNumber.OrderBy(var => var.Pos).ToList();
+                        foreach (var item in preNumber)
                         {
-                            double itemDeviation = 0.00;
-                            itemDeviation = item.Number - realDataList[item.Pos - (intDataCount - 1) * intLetterL - 1].Number;
+                            var itemDeviation = 0.00;
+                            itemDeviation = item.Number - _realDataList[item.Pos - (_intDataCount - 1) * _intLetterL - 1].Number;
                             itemDeviation = Math.Abs(itemDeviation) * 100;
-                            deviation += itemDeviation / realDataList[item.Pos - (intDataCount - 1) * intLetterL - 1].Number;
+                            deviation += itemDeviation / _realDataList[item.Pos - (_intDataCount - 1) * _intLetterL - 1].Number;
                         }
-                        deviation = deviation / intLetterL;
+                        deviation = deviation / _intLetterL;
 
-                        if (minResult.Prediction.Count == 0 || deviation < minResult.Average)
+                        if (_minResult.Prediction.Count == 0 || deviation < _minResult.Average)
                         {
-                            minResult.Alpha = realAlpha;
-                            minResult.Beta = realBeta;
-                            minResult.Gamma = realGamma;
-                            minResult.Average = deviation;
-                            minResult.Prediction = preNumber;
+                            _minResult.Alpha = realAlpha;
+                            _minResult.Beta = realBeta;
+                            _minResult.Gamma = realGamma;
+                            _minResult.Average = deviation;
+                            _minResult.Prediction = preNumber;
 
                             blnFlush = true;
                         }
@@ -245,7 +256,7 @@ namespace Wenster
                         //显示进度
                         tssProcessValue.Text = "正在计算中";
                         bwProcessor.ReportProgress(Convert.ToInt32(alpha) + 1);
-                        this.tspProgressValue.Text = lngCalcNumber + " / " + lngTotalNum;
+                        this.tspProgressValue.Text = _lngCalcNumber + " / " + lngTotalNum;
                         this.lblAlphaValue.Text = "Alpha=" + realAlpha + " | 平均数=" + deviation;
                          
                     }
@@ -262,148 +273,66 @@ namespace Wenster
                 this.lvwResult.Items.Clear();
                 ListViewItem item = new ListViewItem();
                 item.Text = this.lvwResult.Items.Count + 1 + "";
-                item.SubItems.AddRange(new string[] { "Alpha值", minResult.Alpha + "" });
+                item.SubItems.AddRange(new string[] { "Alpha值", _minResult.Alpha + "" });
                 this.lvwResult.Items.Add(item);
 
                 item = new ListViewItem();
                 item.Text = this.lvwResult.Items.Count + 1 + "";
-                item.SubItems.AddRange(new string[] { "Beta值", minResult.Beta + "" });
+                item.SubItems.AddRange(new string[] { "Beta值", _minResult.Beta + "" });
                 this.lvwResult.Items.Add(item);
 
                 item = new ListViewItem();
                 item.Text = this.lvwResult.Items.Count + 1 + "";
-                item.SubItems.AddRange(new string[] { "Gamma值", minResult.Gamma + "" });
+                item.SubItems.AddRange(new string[] { "Gamma值", _minResult.Gamma + "" });
                 this.lvwResult.Items.Add(item);
 
-                item = new ListViewItem();
-                item.Text = this.lvwResult.Items.Count + 1 + "";
-                item.SubItems.AddRange(new string[] { "平均误差值", minResult.Average + "" });
-                this.lvwResult.Items.Add(item);
+                item = new ListViewItem {Text = lvwResult.Items.Count + 1 + ""};
+                item.SubItems.AddRange(new[] { "平均误差值", _minResult.Average + "" });
+                lvwResult.Items.Add(item);
 
-                foreach (Variable var in minResult.Prediction)
+                foreach (var var in _minResult.Prediction)
                 {
-                    item = new ListViewItem();
-                    item.Text = this.lvwResult.Items.Count + 1 + "";
-                    item.SubItems.AddRange(new string[] { "第" + intDataCount + "周第" + (var.Pos - (intDataCount - 1) * intLetterL) + "天", var.Number + "" });
-                    this.lvwResult.Items.Add(item);
+                    item = new ListViewItem {Text = lvwResult.Items.Count + 1 + ""};
+                    item.SubItems.AddRange(new[] { "第" + _intDataCount + "周第" + (var.Pos - (_intDataCount - 1) * _intLetterL) + "天", var.Number + "" });
+                    lvwResult.Items.Add(item);
                 }
             };
             //利用invoke转发委托
-            this.Invoke(cto);
+            Invoke(cto);
         }
 
         //清除集合中的数据
         private void CleanCollection(int minPos,int maxPos)
         {
-            List<Variable> tmpCollectionB = new List<Variable>();
-            foreach (Variable item in collectionB)
-            {
-                if (item.Pos >= minPos && item.Pos <= maxPos)
-                {
-                    continue;
-                }
-                else
-                {
-                    tmpCollectionB.Add(item);
-                }
-            }
-            collectionB = new List<Variable>();
-            collectionB = tmpCollectionB;
+            var tmpCollectionB = _collectionB.Where(item => item.Pos < minPos || item.Pos > maxPos).ToList();
+            _collectionB = new List<Variable>();
+            _collectionB = tmpCollectionB;
 
-            List<Variable> tmpCollectionF = new List<Variable>();
-            foreach (Variable item in collectionF)
-            {
-                if (item.Pos >= minPos && item.Pos <= maxPos)
-                {
-                    continue;
-                }
-                else
-                {
-                    tmpCollectionF.Add(item);
-                }
-            }
-            collectionF = new List<Variable>();
-            collectionF = tmpCollectionF;
+            var tmpCollectionF = _collectionF.Where(item => item.Pos < minPos || item.Pos > maxPos).ToList();
+            _collectionF = new List<Variable>();
+            _collectionF = tmpCollectionF;
 
-            List<Variable> tmpCollectionS = new List<Variable>();
-            foreach (Variable item in collectionS)
-            {
-                if (item.Pos >= minPos && item.Pos <= maxPos)
-                {
-                    continue;
-                }
-                else
-                {
-                    tmpCollectionS.Add(item);
-                }
-            }
-            collectionS = new List<Variable>();
-            collectionS = tmpCollectionS;
+            var tmpCollectionS = _collectionS.Where(item => item.Pos < minPos || item.Pos > maxPos).ToList();
+            _collectionS = new List<Variable>();
+            _collectionS = tmpCollectionS;
         }
         
 
        //根据序号获取集合中数据值
-        private double GetCollectionRecordValue(List<Variable> items, int posNumber)
+        private double GetCollectionRecordValue(IEnumerable<Variable> items, int posNumber)
         {
-            foreach (Variable item in items)
-            {
-                if (item.Pos == posNumber)
-                {
-                    return item.Number;
-                }
-            }
-            return 0.00;
+            return (from item in items where item.Pos == posNumber select item.Number).FirstOrDefault();
         }
 
-        private void bwProcessor_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        private void BwProcessorRunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            tssProcessValue.Text = "计算已完成";
+            tssProcessValue.Text = Resources.CALC_COMPLETED;
             gbSetting.Enabled = true;
         }
 
-        private void bwProcessor_ProgressChanged(object sender, ProgressChangedEventArgs e)
+        private void BwProcessorProgressChanged(object sender, ProgressChangedEventArgs e)
         {
-            this.tspProgress.Value = e.ProgressPercentage;
-        }
-
-        private void statusBar_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
-        {
-
-        }
-
-        private void lblLetterL_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void txtLetterL_TextChanged(object sender, EventArgs e)
-        {
-
-        }
-
-        private void lblInitDataCount_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void txtInitDataCount_TextChanged(object sender, EventArgs e)
-        {
-
-        }
-
-        private void lvwResult_SelectedIndexChanged(object sender, EventArgs e)
-        {
-
-        }
-
-        private void tspProgress_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void tssAppName_Click(object sender, EventArgs e)
-        {
-
+            tspProgress.Value = e.ProgressPercentage;
         }
     }
 }

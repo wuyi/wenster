@@ -73,7 +73,6 @@
             this.txtInitDataCount.Name = "txtInitDataCount";
             this.txtInitDataCount.Size = new System.Drawing.Size(100, 21);
             this.txtInitDataCount.TabIndex = 4;
-            this.txtInitDataCount.TextChanged += new System.EventHandler(this.txtInitDataCount_TextChanged);
             // 
             // lblInitDataCount
             // 
@@ -83,7 +82,6 @@
             this.lblInitDataCount.Size = new System.Drawing.Size(77, 12);
             this.lblInitDataCount.TabIndex = 3;
             this.lblInitDataCount.Text = "计算的周期：";
-            this.lblInitDataCount.Click += new System.EventHandler(this.lblInitDataCount_Click);
             // 
             // btnCalc
             // 
@@ -94,7 +92,7 @@
             this.btnCalc.TabIndex = 2;
             this.btnCalc.Text = "开始计算";
             this.btnCalc.UseVisualStyleBackColor = true;
-            this.btnCalc.Click += new System.EventHandler(this.btnCalc_Click);
+            this.btnCalc.Click += new System.EventHandler(this.BtnCalcClick);
             // 
             // txtLetterL
             // 
@@ -103,7 +101,6 @@
             this.txtLetterL.Name = "txtLetterL";
             this.txtLetterL.Size = new System.Drawing.Size(101, 21);
             this.txtLetterL.TabIndex = 1;
-            this.txtLetterL.TextChanged += new System.EventHandler(this.txtLetterL_TextChanged);
             // 
             // lblLetterL
             // 
@@ -113,7 +110,6 @@
             this.lblLetterL.Size = new System.Drawing.Size(83, 12);
             this.lblLetterL.TabIndex = 0;
             this.lblLetterL.Text = "季节性周期L：";
-            this.lblLetterL.Click += new System.EventHandler(this.lblLetterL_Click);
             // 
             // gbResult
             // 
@@ -159,7 +155,6 @@
             this.lvwResult.TabIndex = 0;
             this.lvwResult.UseCompatibleStateImageBehavior = false;
             this.lvwResult.View = System.Windows.Forms.View.Details;
-            this.lvwResult.SelectedIndexChanged += new System.EventHandler(this.lvwResult_SelectedIndexChanged);
             // 
             // colId
             // 
@@ -188,14 +183,12 @@
             this.statusBar.Size = new System.Drawing.Size(359, 23);
             this.statusBar.TabIndex = 2;
             this.statusBar.Text = "statusStrip1";
-            this.statusBar.ItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.statusBar_ItemClicked);
             // 
             // tssAppName
             // 
             this.tssAppName.Name = "tssAppName";
             this.tssAppName.Size = new System.Drawing.Size(53, 18);
             this.tssAppName.Text = "(C) 2011";
-            this.tssAppName.Click += new System.EventHandler(this.tssAppName_Click);
             // 
             // tssProcessValue
             // 
@@ -208,7 +201,6 @@
             // 
             this.tspProgress.Name = "tspProgress";
             this.tspProgress.Size = new System.Drawing.Size(100, 17);
-            this.tspProgress.Click += new System.EventHandler(this.tspProgress_Click);
             // 
             // tspProgressValue
             // 
@@ -220,9 +212,8 @@
             // bwProcessor
             // 
             this.bwProcessor.WorkerReportsProgress = true;
-            this.bwProcessor.DoWork += new System.ComponentModel.DoWorkEventHandler(this.bwProcessor_DoWork);
-            this.bwProcessor.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.bwProcessor_RunWorkerCompleted);
-            this.bwProcessor.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.bwProcessor_ProgressChanged);
+            this.bwProcessor.DoWork += new System.ComponentModel.DoWorkEventHandler(this.BwProcessorDoWork);
+            this.bwProcessor.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.BwProcessorProgressChanged);
             // 
             // frmWenster
             // 
@@ -236,7 +227,7 @@
             this.Name = "frmWenster";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Wenster";
-            this.Load += new System.EventHandler(this.frmWenster_Load);
+            this.Load += new System.EventHandler(this.FrmWensterLoad);
             this.gbSetting.ResumeLayout(false);
             this.gbSetting.PerformLayout();
             this.gbResult.ResumeLayout(false);
