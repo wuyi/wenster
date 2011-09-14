@@ -1,0 +1,32 @@
+D:\Source\app\Wenster\Wenster\bin\Debug\Wenster.exe
+D:\Source\app\Wenster\Wenster\bin\Debug\Wenster.pdb
+D:\Source\app\Wenster\Wenster\obj\Debug\ResolveAssemblyReference.cache
+D:\Source\app\Wenster\Wenster\obj\Debug\Wenster.frmWenster.resources
+D:\Source\app\Wenster\Wenster\obj\Debug\Wenster.Properties.Resources.resources
+D:\Source\app\Wenster\Wenster\obj\Debug\Wenster.csproj.GenerateResource.Cache
+D:\Source\app\Wenster\Wenster\obj\Debug\Wenster.exe
+D:\Source\app\Wenster\Wenster\obj\Debug\Wenster.pdb
+X:\Dev\Dot Net\Source\Application\Wenster\Wenster\obj\Debug\Wenster.exe
+X:\Dev\Dot Net\Source\Application\Wenster\Wenster\obj\Debug\Wenster.pdb
+X:\Dev\Dot Net\Source\Application\Wenster\Wenster\bin\Debug\Wenster.exe
+X:\Dev\Dot Net\Source\Application\Wenster\Wenster\bin\Debug\Wenster.pdb
+X:\Dev\Dot Net\Source\Application\Wenster\Wenster\obj\Debug\ResolveAssemblyReference.cache
+X:\Dev\Dot Net\Source\Application\Wenster\Wenster\obj\Debug\Wenster.frmWenster.resources
+X:\Dev\Dot Net\Source\Application\Wenster\Wenster\obj\Debug\Wenster.Properties.Resources.resources
+X:\Dev\Dot Net\Source\Application\Wenster\Wenster\obj\Debug\Wenster.csproj.GenerateResource.Cache
+D:\能源系统\新建文件夹\Source\Wenster\obj\Debug\Wenster.exe
+D:\能源系统\新建文件夹\Source\Wenster\obj\Debug\Wenster.pdb
+D:\能源系统\新建文件夹\Source\Wenster\bin\Debug\Wenster.exe
+D:\能源系统\新建文件夹\Source\Wenster\bin\Debug\Wenster.pdb
+D:\能源系统\新建文件夹\Source\Wenster\obj\Debug\ResolveAssemblyReference.cache
+D:\能源系统\新建文件夹\Source\Wenster\obj\Debug\Wenster.frmWenster.resources
+D:\能源系统\新建文件夹\Source\Wenster\obj\Debug\Wenster.Properties.Resources.resources
+D:\能源系统\新建文件夹\Source\Wenster\obj\Debug\Wenster.csproj.GenerateResource.Cache
+H:\Source\Wenster\obj\Debug\Wenster.exe
+H:\Source\Wenster\obj\Debug\Wenster.pdb
+H:\Source\Wenster\bin\Debug\Wenster.exe
+H:\Source\Wenster\bin\Debug\Wenster.pdb
+H:\Source\Wenster\obj\Debug\ResolveAssemblyReference.cache
+H:\Source\Wenster\obj\Debug\Wenster.frmWenster.resources
+H:\Source\Wenster\obj\Debug\Wenster.Properties.Resources.resources
+H:\Source\Wenster\obj\Debug\Wenster.csproj.GenerateResource.Cache
